@@ -1,5 +1,5 @@
 import { createContext, useState } from 'react';
-
+// eslint-disable-next-line react-refresh/only-export-components
 export const InventoryContext = createContext();
 
 export const InventoryProvider = ({ children }) => {
@@ -9,14 +9,18 @@ export const InventoryProvider = ({ children }) => {
 
   const addCard = (cardData) => {
     let estimatedPrice = 'No disponible';
-    if (cardData.tcgplayer && cardData.tcgplayer.prices) {
-      const prices = cardData.tcgplayer.prices;
-      if (prices.normal && prices.normal.mid) {
-        estimatedPrice = `$${prices.normal.mid} USD`;
-      } else if (prices.holofoil && prices.holofoil.mid) {
-        estimatedPrice = `$${prices.holofoil.mid} USD`;
-      }
-    }
+    const tcgPrices = cardData.tcgplayer?.prices ? Object.values(cardData.tcgplayer.prices) : [];
+    const firstTcgPrice = tcgPrices.find((p) => p.market || p.mid || p.low);
+    const priceValue =
+      firstTcgPrice?.market ||
+      firstTcgPrice?.mid ||
+      firstTcgPrice?.low ||
+      cardData.cardmarket?.prices?.averageSellPrice ||
+      cardData.cardmarket?.prices?.trendPrice;
+
+  if (priceValue) {
+    estimatedPrice = `$${priceValue} USD`;
+  }
 
     const newCard = {
       id: new Date().getTime(),
