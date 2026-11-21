@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import Scanner from './components/Scanner';
 import Inventory from './components/Inventory';
 import TransactionHistory from './components/TransactionHistory';
+import MissingCards from './components/MissingCards';
 function App() {
   return (
     <LanguageProvider>
@@ -21,10 +22,14 @@ function App() {
             {/* Separador visual */}
             <hr className="my-10 border-gray-300" /> 
             
-            {/* coleción */}
+            {/* colección */}
             <Inventory />
             <hr className="my-10 border-gray-300" />
             <TransactionHistory />
+            <hr className="my-10 border-gray-300" />
+            <MissingCards />
+
+          
           </main>
 
         </div>
