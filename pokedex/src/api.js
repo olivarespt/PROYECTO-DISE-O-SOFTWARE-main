@@ -1,6 +1,7 @@
 export const searchCardByName = async (name) => {
   try {
-    const response = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${name}"`);
+    const query = encodeURIComponent(`name:"${name}"`);
+    const response = await fetch(`https://api.pokemontcg.io/v2/cards?q=${query}`);
     const data = await response.json();
     return data.data;
   } catch (error) {
