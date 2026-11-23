@@ -28,7 +28,7 @@ const Scanner = () => {
     try {
         const cleanFileName = selectedFileName
           .replace(/\.[^/.]+$/, "")
-          .replace(/[_-]+/g, '')
+          .replace(/_+/g, '')
           .trim();
         let results = [];
 
