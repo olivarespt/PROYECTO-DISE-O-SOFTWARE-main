@@ -5,10 +5,11 @@ import { searchCardByName } from '../api';
 
 const Scanner = () => {
   const { t } = useContext(LanguageContext);
-  // añadir cartas al inventario
+  // add cards to inventory
   const { addCard } = useContext(InventoryContext); 
   
   const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedFileName, setSelectedFileName] = useState('');
   const [isScanning, setIsScanning] = useState(false);
   const [scannedCardData, setScannedCardData] = useState(null); 
 
@@ -16,26 +17,52 @@ const Scanner = () => {
     const file = event.target.files[0];
     if (file) {
       setSelectedImage(URL.createObjectURL(file));
+      setSelectedFileName(file.name);
       setScannedCardData(null); 
     }
   };
 
   const handleScan = async () => {
     setIsScanning(true);
-    const simulatedRecognizedName = "Charizard"; 
+    
     try {
-        const results = await searchCardByName(simulatedRecognizedName);
-        if (results && results.length > 0) {
-            setScannedCardData(results[0]); 
-        } else {
-            alert("No se encontró la carta en la base de datos.");
+        const cleanFileName = selectedFileName
+          .replace(/\.[^/.]+$/, "")
+          .replace(/[_-]+/g, '')
+          .trim();
+        let results = [];
+
+        if (cleanFileName && isNaN(cleanFileName)) {
+          results = await searchCardByName(cleanFileName);
         }
-    } catch (error) {
-        console.error("Error escaneando", error);
-    } finally {
+
+        if (results && results.length > 0) {
+          setScannedCardData(results[0]);
+        } else {
+          
+          const knownPokemon = [
+            'Pikachu', 'Charizard', 'Bulbasaur', 'Squirtle', 'Jigglypuff', 'Meowth', 'Psyduck', 'Snorlax', 'Gengar', 'Eevee', 'Rayquaza',
+            'Mewtwo', 'Lucario', 'Greninja', 'Togekiss', 'Garchomp', 'Infernape', 'Blaziken', 'Sceptile', 'Swampert'
+          ];
+          const lowerName = cleanFileName.toLowerCase();
+          const matchedName = knownPokemon.find((poke) => lowerName.includes(poke.toLowerCase()));
+          const fallbackQuery = matchedName || knownPokemon[Math.floor(Math.random() * knownPokemon.length)];
+
+          const fallbackResults = await searchCardByName(fallbackQuery);
+          if (fallbackResults && fallbackResults.length > 0) {
+            const randomCard = fallbackResults[Math.floor(Math.random() * fallbackResults.length)];
+            setScannedCardData(randomCard);
+          }else{
+            alert("No se encontró tu carta en la base de datos :(");
+          }
+        }
+      } catch (error) {
+        console.error("Error al buscar la carta:", error);
+      } finally{
         setIsScanning(false);
-    }
-  };
+      }
+    };
+          
 
   // Guardar la carta y limpiar el escáner
   const handleSaveCard = () => {
